@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Moteur de Recherche XML</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    h1 { color: #2c3e50; }
+    input, button { padding: 8px; margin: 5px; }
+    .result { border: 1px solid #ccc; padding: 10px; margin: 10px 0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>Moteur de Recherche XML</h1>
+
+  <label>Mot-clé :</label>
+  <input type="text" id="keyword" placeholder="Titre ou contenu">
+  <label>Auteur :</label>
+  <input type="text" id="author" placeholder="Nom de l'auteur">
+  <label>Date :</label>
+  <input type="date" id="date">
+  <button onclick="searchXML()">Rechercher</button>
+
+  <h2>Résultats :</h2>
+  <div id="results"></div>
+
+  <script>
+    async function searchXML() {
+      const keyword = document.getElementById("keyword").value.trim();
+      console.log(keyword)
+      const author = document.getElementById("author").value.trim();
+      const date = document.getElementById("date").value;
+      
+      // Charger le fichier XML
+      const xmlResponse = await fetch("articles.xml");
+      const xmlText = await xmlResponse.text();
+      const parser = new DOMParser();
+      const xmlDoc = parser.parseFromString(xmlText, "text/xml");
+
+      // Construire l’expression XPath dynamiquement
+      let xpath = "/articles/article";
+      let conditions = [];
+      if (keyword) conditions.push(`(contains(title,'${keyword}') or contains(content,'${keyword}'))`);
+      if (author) conditions.push(`author='${author}'`);
+      if (date) conditions.push(`date='${date}'`);
+      if (conditions.length > 0) xpath += `[${conditions.join(" and ")}]`;
+
+      // Évaluer XPath
+      const resultsContainer = document.getElementById("results");
+      resultsContainer.innerHTML = ""; // Nettoyer les résultats précédents
+      const evaluator = new XPathEvaluator();
+      const result = evaluator.evaluate(xpath, xmlDoc, null, XPathResult.ORDERED_NODE_ITERATOR_TYPE, null);
+
+      let node = result.iterateNext();
+      if (!node) {
+        resultsContainer.innerHTML = "<p>Aucun article trouvé.</p>";
+        return;
+      }
+
+      while (node) {
+        const title = node.getElementsByTagName("title")[0].textContent;
+        const authorName = node.getElementsByTagName("author")[0].textContent;
+        const pubDate = node.getElementsByTagName("date")[0].textContent;
+        const content = node.getElementsByTagName("content")[0].textContent;
+
+        resultsContainer.innerHTML += `
+          <div class="result">
+            <h3>${title}</h3>
+            <p><b>Auteur :</b> ${authorName}</p>
+            <p><b>Date :</b> ${pubDate}</p>
+            <p>${content}</p>
+          </div>
+        `;
+
+        node = result.iterateNext();
+      }
+    }
+  </script>
+</body>
+</html>

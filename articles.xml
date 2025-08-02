@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="search.xsl" type="text/xsl"?>
+<?xml-stylesheet href="file.css" type="text/css"?>
+<articles>
+  <article>
+    <title>Introduction à XML</title>
+    <author>Jean Dupont</author>
+    <date>2025-08-02</date> <!-- AAAA/MM/JJ-->
+    <content>Ce document présente les bases du langage XML et ses principales utilisations.</content>
+  </article>
+  <article>
+    <title>XPath et ses applications</title>
+    <author>Marie Claire</author>
+    <date>2022-03-02</date> <!-- AAAA/MM/JJ-->
+    <content>XPath est un langage de requête pour naviguer dans les documents XML.</content>
+  </article>
+</articles>
